@@ -152,6 +152,25 @@
       text-align: left;
       transition: border-color 0.15s, background 0.15s, color 0.15s;
       line-height: 1.4;
+      width: 100%;
+    }
+
+    .mc-btn .opt-label {
+      font-weight: bold;
+      margin-right: 6px;
+    }
+
+    .mc-btn pre.opt-code {
+      font-family: 'VT323', monospace;
+      font-size: 19px;
+      line-height: 1.5;
+      margin: 6px 0 0 0;
+      padding: 0;
+      white-space: pre;
+      background: transparent;
+      border: none;
+      color: inherit;
+      text-align: left;
     }
 
     .mc-btn:not(:disabled):hover {
@@ -251,6 +270,50 @@
     }
 
     .next-btn:hover { background: #280f55; }
+
+    /* ── FR model answer display ── */
+    .model-answer-wrap {
+      margin-top: 0.75rem;
+    }
+    .model-answer-label {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: #7dffb3;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .mark-correct-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      background: #0f2a1a;
+      border: 2px solid #7dffb3;
+      color: #7dffb3;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.15s;
+      margin-right: 8px;
+    }
+    .mark-correct-btn:hover { background: #163a24; }
+
+
+    .end-game-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      background: #2a0f1a;
+      border: 2px solid #ff7daa;
+      color: #ff7daa;
+      padding: 11px 22px;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.15s;
+      display: none;
+    }
+    .end-game-btn:hover { background: #3a1525; }
+
 
     .try-again-btn {
       font-family: 'Press Start 2P', monospace;
@@ -372,8 +435,10 @@
       width: 100%; height: 100%;
     }
 
-    .tile.revealed .tile-cover { opacity: 0; }
-    .tile.revealed .tile-reveal { opacity: 1; }
+    .tile.revealed.answered-correct .tile-cover { opacity: 0; }
+    .tile.revealed.answered-correct .tile-reveal { opacity: 1; }
+    .tile.revealed.answered-wrong .tile-cover { opacity: 1; }
+    .tile.revealed.answered-wrong .tile-reveal { opacity: 0; }
 
     /* ── Score ── */
     .score-row {
@@ -629,11 +694,248 @@
     }
 
     .skip-link:hover { color: #7070a0; }
+
+    /* ── Teacher mode ── */
+    .teacher-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      background: #1a0a2a;
+      border: 2px solid #c77dff;
+      color: #c77dff;
+      padding: 11px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.15s;
+      width: 100%;
+      margin-top: 0.75rem;
+    }
+    .teacher-btn:hover { background: #280f40; }
+
+    .pw-modal-bg {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .pw-modal {
+      background: #10102a;
+      border: 2px solid #c77dff;
+      border-radius: 10px;
+      padding: 2rem;
+      width: 100%; max-width: 380px;
+      text-align: center;
+    }
+    .pw-modal-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: #c77dff;
+      margin-bottom: 1rem;
+      letter-spacing: 1px;
+    }
+    .pw-input {
+      width: 100%;
+      background: #050510;
+      border: 1.5px solid #5a2a8a;
+      border-radius: 6px;
+      color: #c0c0f0;
+      font-family: 'VT323', monospace;
+      font-size: 22px;
+      padding: 8px 12px;
+      margin-bottom: 0.75rem;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+    .pw-input:focus { outline: none; border-color: #c77dff; }
+    .pw-submit {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      background: #1a0a2a;
+      border: 2px solid #c77dff;
+      color: #c77dff;
+      padding: 10px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 0.5rem;
+      transition: background 0.15s;
+    }
+    .pw-submit:hover { background: #280f40; }
+    .pw-cancel {
+      font-size: 15px;
+      color: #505070;
+      cursor: pointer;
+      display: block;
+      margin-top: 0.5rem;
+    }
+    .pw-cancel:hover { color: #8080a0; }
+    .pw-error {
+      font-size: 16px;
+      color: #ff7070;
+      margin-bottom: 0.5rem;
+      display: none;
+    }
+
+    /* ── Teacher answer sheet ── */
+    #teacher-sheet {
+      display: none;
+    }
+    .teacher-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #3a2a5a;
+    }
+    .teacher-header h1 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(10px, 2vw, 15px);
+      color: #c77dff;
+      margin-bottom: 0.5rem;
+    }
+    .teacher-header p {
+      font-size: 18px;
+      color: #7070a0;
+    }
+    .teacher-nav {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .t-nav-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      padding: 7px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1.5px solid #3a2a5a;
+      background: #10102a;
+      color: #8080b0;
+      transition: all 0.15s;
+    }
+    .t-nav-btn:hover, .t-nav-btn.active {
+      border-color: #c77dff;
+      color: #c77dff;
+      background: #1a0a2a;
+    }
+    .teacher-q-card {
+      background: #10102a;
+      border: 1.5px solid #2a2a5a;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .teacher-q-card.diff-easy   { border-left: 4px solid #7dffb3; }
+    .teacher-q-card.diff-medium { border-left: 4px solid #ffd97d; }
+    .teacher-q-card.diff-hard   { border-left: 4px solid #ff9090; }
+    .teacher-q-card.diff-oop    { border-left: 4px solid #c77dff; }
+    .t-q-header {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .t-q-num {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: #6060a0;
+    }
+    .t-q-text {
+      font-size: 19px;
+      color: #c0c0e0;
+      margin-bottom: 0.75rem;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+    .t-options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 0.75rem;
+    }
+    .t-opt {
+      font-family: 'VT323', monospace;
+      font-size: 18px;
+      padding: 7px 12px;
+      border-radius: 5px;
+      border: 1.5px solid #2a2a50;
+      color: #8080a0;
+      background: #080816;
+      white-space: pre-wrap;
+    }
+    .t-opt.correct-ans {
+      border-color: #7dffb3;
+      background: #082a18;
+      color: #7dffb3;
+    }
+    .t-opt.correct-ans::before {
+      content: '✓ ';
+      font-weight: bold;
+    }
+    .t-explanation {
+      font-size: 17px;
+      color: #8080b0;
+      line-height: 1.5;
+      padding: 0.6rem 0.8rem;
+      background: #0a0a20;
+      border-radius: 5px;
+      border-left: 3px solid #5050a0;
+    }
+    .t-rubric {
+      font-size: 17px;
+      color: #c0a0ff;
+      line-height: 1.6;
+      padding: 0.6rem 0.8rem;
+      background: #100820;
+      border-radius: 5px;
+      border-left: 3px solid #7040b0;
+    }
+    .exit-teacher-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      background: #1a0a2a;
+      border: 2px solid #c77dff;
+      color: #c77dff;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto 2rem;
+      transition: background 0.15s;
+    }
+    .exit-teacher-btn:hover { background: #280f40; }
+
   </style>
 </head>
 <body>
 
 <canvas id="confetti-canvas"></canvas>
+
+<!-- ── Teacher password modal ── -->
+<div class="pw-modal-bg" id="pw-modal" style="display:none;">
+  <div class="pw-modal">
+    <div class="pw-modal-title">TEACHER MODE</div>
+    <input class="pw-input" type="password" id="pw-input" placeholder="Password"
+      onkeydown="if(event.key==='Enter')checkPassword()" autocomplete="off" />
+    <div class="pw-error" id="pw-error">Incorrect password</div>
+    <button class="pw-submit" onclick="checkPassword()">ENTER</button>
+    <span class="pw-cancel" onclick="closePwModal()">cancel</span>
+  </div>
+</div>
+
+<!-- ── Teacher answer sheet ── -->
+<div id="teacher-sheet" class="wrapper">
+  <div class="teacher-header">
+    <h1>[ TEACHER ANSWER KEY ]</h1>
+    <p>All questions with correct answers and explanations</p>
+  </div>
+  <button class="exit-teacher-btn" onclick="exitTeacherMode()">&#8592; EXIT TEACHER MODE</button>
+  <div class="teacher-nav" id="teacher-nav"></div>
+  <div id="teacher-questions"></div>
+  <button class="exit-teacher-btn" onclick="exitTeacherMode()">&#8592; EXIT TEACHER MODE</button>
+</div>
+
 
 <!-- ── Start screen ── -->
 <div id="start-screen">
@@ -645,6 +947,7 @@
       Write your Java code answers and check them against the rubric.<br>Be honest — the learning is up to you!
     </p>
     <button class="start-btn" onclick="startGame()">START GAME</button>
+    <button class="teacher-btn" onclick="openPwModal()">TEACHER MODE</button>
   </div>
 </div>
 
@@ -668,8 +971,8 @@
       <div class="feedback-box" id="feedback-box"></div>
       <div class="action-row" id="action-row" style="margin-top:0.75rem;">
         <button class="next-btn" id="next-btn" onclick="nextQuestion()">NEXT &gt;&gt;</button>
+        <button class="end-game-btn" id="end-game-btn" onclick="showWin()">END GAME</button>
         <button class="try-again-btn" id="try-again-btn" onclick="tryAgain()">TRY AGAIN</button>
-        <button class="skip-q-btn" id="skip-q-btn" onclick="skipQuestion()">SKIP &gt;</button>
       </div>
     </div>
 
@@ -982,7 +1285,8 @@ const Q_GENERATORS = [
   function() {
     return { id:6, diff:'medium', type:'fr',
       text:'Write a Java method that takes a 2D int array and returns the sum of ALL elements.\n\nMethod signature:\npublic static int sumAll(int[][] arr)',
-      rubric:'Iterate all elements and accumulate a sum variable, return the total. Accept both traditional nested for loops (arr.length / arr[0].length) AND enhanced for-each loops (for int[] row : arr, then for int val : row). Method header is optional — grade body only. Award partial credit for correct structure with minor errors like off-by-one.'
+      rubric:'Iterate all elements and accumulate a sum variable, return the total. Accept both traditional nested for loops (arr.length / arr[0].length) AND enhanced for-each loops (for int[] row : arr, then for int val : row). Method header is optional — grade body only. Award partial credit for correct structure with minor errors like off-by-one.',
+      modelAnswer:'int sum = 0;\nfor (int[] row : arr) {\n    for (int val : row) {\n        sum += val;\n    }\n}\nreturn sum;'
     };
   },
 
@@ -996,7 +1300,8 @@ const Q_GENERATORS = [
     const f = pick(formulas);
     return { id:7, diff:'medium', type:'fr',
       text:`Write code to fill a 3×3 int array called board so that each element equals ${f.expr}.\n\nFor example: board[2][1] = ${f.example(2,1)}`,
-      rubric:`Must declare int[][] board = new int[3][3], use traditional nested for loops with index variables r and c, and assign board[r][c] = ${f.expr}. A for-each loop is NOT acceptable here because the formula uses the index values r and c. Method header not required — grade body only. Partial credit for correct loop structure even if declaration is off.`
+      rubric:`Must declare int[][] board = new int[3][3], use traditional nested for loops with index variables r and c, and assign board[r][c] = ${f.expr}. A for-each loop is NOT acceptable here because the formula uses the index values r and c. Method header not required — grade body only. Partial credit for correct loop structure even if declaration is off.`,
+      modelAnswer:`int[][] board = new int[3][3];\nfor (int r = 0; r < 3; r++) {\n    for (int c = 0; c < 3; c++) {\n        board[r][c] = ${f.expr};\n    }\n}`
     };
   },
 
@@ -1020,7 +1325,8 @@ const Q_GENERATORS = [
     const a=rnd(1,5),b=rnd(1,5),c=rnd(1,5),d=rnd(1,5),e=rnd(1,5),f=rnd(1,5);
     return { id:9, diff:'hard', type:'fr',
       text:`Write a method that takes a 2D int array and returns a NEW 1D array containing the sum of each row.\n\nExample: {{${a},${b},${c}},{${d},${e},${f}}} → {${a+b+c}, ${d+e+f}}\n\nMethod signature:\npublic static int[] rowSums(int[][] arr)`,
-      rubric:'Must create a new int[] of length arr.length. Outer loop must use an index (to store into result[r]) — traditional for loop required for outer. Inner loop may be a traditional for loop OR a for-each (for int val : arr[r]). Sum each row, store in result, return it. Method header optional. Deduct for wrong array size or missing return.'
+      rubric:'Must create a new int[] of length arr.length. Outer loop must use an index (to store into result[r]) — traditional for loop required for outer. Inner loop may be a traditional for loop OR a for-each (for int val : arr[r]). Sum each row, store in result, return it. Method header optional. Deduct for wrong array size or missing return.',
+      modelAnswer:'int[] result = new int[arr.length];\nfor (int r = 0; r < arr.length; r++) {\n    for (int val : arr[r]) {\n        result[r] += val;\n    }\n}\nreturn result;'
     };
   },
 
@@ -1028,7 +1334,8 @@ const Q_GENERATORS = [
   function() {
     return { id:10, diff:'hard', type:'fr',
       text:'Write a method that rotates a square 2D array 90 degrees clockwise and returns the new array.\n\nHint: result[c][n-1-r] = original[r][c]  (n = side length)\n\nMethod signature:\npublic static int[][] rotateCW(int[][] arr)',
-      rubric:'Should declare result as new int[n][n] where n = arr.length, use traditional nested for loops with index variables (for-each cannot work here since the formula needs r and c), apply result[c][n-1-r] = arr[r][c], and return result. Method header optional. Partial credit for correct structure with wrong index formula.'
+      rubric:'Should declare result as new int[n][n] where n = arr.length, use traditional nested for loops with index variables (for-each cannot work here since the formula needs r and c), apply result[c][n-1-r] = arr[r][c], and return result. Method header optional. Partial credit for correct structure with wrong index formula.',
+      modelAnswer:'int n = arr.length;\nint[][] result = new int[n][n];\nfor (int r = 0; r < n; r++) {\n    for (int c = 0; c < n; c++) {\n        result[c][n - 1 - r] = arr[r][c];\n    }\n}\nreturn result;'
     };
   },
 
@@ -1087,7 +1394,7 @@ function getOopSet(artIdx, clsOverride) {
           text:`Given this class:\n\npublic class ${cls} {\n  private int value;\n  public ${cls}(int v) { this.value = v; }\n  public int getValue() { return value; }\n  public void setValue(int v) { value = v; }\n}\n\nWhich code correctly creates a ${sz}×${sz} grid of ${cls} objects?`,
           options: shuffle([
             `${cls}[][] grid = new ${cls}[${sz}][${sz}];  // all done!`,
-            `${cls}[][] grid = new ${cls}[${sz}][${sz}];\nfor(int r=0;r<${sz};r++)\n  for(int c=0;c<${sz};c++)\n    grid[r][c] = new ${cls}(0);`,
+            `${cls}[][] grid = new ${cls}[${sz}][${sz}];\nfor (int r = 0; r < ${sz}; r++) {\n    for (int c = 0; c < ${sz}; c++) {\n        grid[r][c] = new ${cls}(0);\n    }\n}`,
             `${cls} grid = new ${cls}[${sz}][${sz}];`,
             `${cls}[][] grid = new ${cls}(${sz}, ${sz});`
           ]),
@@ -1120,7 +1427,7 @@ function getOopSet(artIdx, clsOverride) {
           text:`Given this class:\n\npublic class ${cls} {\n  private int grade;\n  public ${cls}(int g) { this.grade = g; }\n  public int getGrade() { return grade; }\n  public void setGrade(int g) { grade = g; }\n}\n\nWhich code correctly creates a ${sz}×${sz} grid of ${cls} objects, each with grade 0?`,
           options: shuffle([
             `${cls}[][] roster = new ${cls}[${sz}][${sz}];  // done`,
-            `${cls}[][] roster = new ${cls}[${sz}][${sz}];\nfor(int r=0;r<${sz};r++)\n  for(int c=0;c<${sz};c++)\n    roster[r][c] = new ${cls}(0);`,
+            `${cls}[][] roster = new ${cls}[${sz}][${sz}];\nfor (int r = 0; r < ${sz}; r++) {\n    for (int c = 0; c < ${sz}; c++) {\n        roster[r][c] = new ${cls}(0);\n    }\n}`,
             `${cls}[] roster = new ${cls}[${sz}][${sz}];`,
             `${cls}[][] roster = new ${cls}(${sz},${sz});`
           ]),
@@ -1150,7 +1457,7 @@ function getOopSet(artIdx, clsOverride) {
         q12: { id:12, diff:'oop', type:'mc', _cls:cls, _sz:sz,
           text:`Given this class:\n\npublic class ${cls} {\n  private boolean occupied;\n  private int price;\n  public ${cls}(int p) { this.price = p; this.occupied = false; }\n  public boolean isOccupied() { return occupied; }\n  public void setOccupied(boolean b) { occupied = b; }\n  public int getPrice() { return price; }\n}\n\nYou want a ${sz}×${sz} seating grid where every seat costs $${price}. Which is correct?`,
           options: shuffle([
-            `${cls}[][] seats = new ${cls}[${sz}][${sz}];\nfor(int r=0;r<${sz};r++)\n  for(int c=0;c<${sz};c++)\n    seats[r][c] = new ${cls}(${price});`,
+            `${cls}[][] seats = new ${cls}[${sz}][${sz}];\nfor (int r = 0; r < ${sz}; r++) {\n    for (int c = 0; c < ${sz}; c++) {\n        seats[r][c] = new ${cls}(${price});\n    }\n}`,
             `${cls}[][] seats = new ${cls}[${sz}][${sz}];  // seats ready`,
             `${cls}[][] seats;\nseats = new ${cls}(${price})[${sz}][${sz}];`,
             `${cls} seats = new ${cls}[${sz}][${sz}];`
@@ -1183,7 +1490,7 @@ function getOopSet(artIdx, clsOverride) {
         q12: { id:12, diff:'oop', type:'mc', _cls:cls, _sz:sz,
           text:`Given this class:\n\npublic class ${cls} {\n  private int red, green, blue;\n  public ${cls}(int r, int g, int b) {\n    this.red=r; this.green=g; this.blue=b;\n  }\n  public int getRed()   { return red; }\n  public int getGreen() { return green; }\n  public int getBlue()  { return blue; }\n  public void set${capMethod}(int v) { this.${channel}=v; }\n}\n\nWhich correctly creates a ${sz}×${sz} image grid of black pixels (0,0,0)?`,
           options: shuffle([
-            `${cls}[][] img = new ${cls}[${sz}][${sz}];\nfor(int r=0;r<${sz};r++)\n  for(int c=0;c<${sz};c++)\n    img[r][c] = new ${cls}(0,0,0);`,
+            `${cls}[][] img = new ${cls}[${sz}][${sz}];\nfor (int r = 0; r < ${sz}; r++) {\n    for (int c = 0; c < ${sz}; c++) {\n        img[r][c] = new ${cls}(0,0,0);\n    }\n}`,
             `${cls}[][] img = new ${cls}[${sz}][${sz}];  // black by default`,
             `${cls}[][] img = new ${cls}(0,0,0)[${sz}][${sz}];`,
             `${cls} img[][] = new ${cls}[${sz},${sz}];`
@@ -1296,21 +1603,46 @@ function buildPuzzleGrid() {
 
 // ── Navigation ──
 function goToQuestion(index) {
+  // If leaving a pending FR question without marking correct, reset it
+  if (answered[currentQ] === 'pending') {
+    answered[currentQ] = null;
+    studentAnswers[currentQ] = '';
+    feedbacks[currentQ] = null;
+    const tile = tileElements[currentQ];
+    if (tile) tile.classList.remove('revealed', 'answered-correct', 'answered-wrong');
+  }
   currentQ = index;
   renderQuestion();
 }
 
 function nextQuestion() {
+  // If leaving a pending FR question without marking correct, reset it
+  if (answered[currentQ] === 'pending') {
+    answered[currentQ] = null;
+    studentAnswers[currentQ] = '';
+    feedbacks[currentQ] = null;
+    const tile = tileElements[currentQ];
+    if (tile) tile.classList.remove('revealed', 'answered-correct', 'answered-wrong');
+  }
   let next = currentQ + 1;
-  while (next < 16 && answered[next] !== null) next++;
+  while (next < 16 && answered[next] !== null && answered[next] !== 'wrong-attempt') next++;
   if (next < 16) { currentQ = next; renderQuestion(); }
-  else showWin();
+  else {
+    const hasUnanswered = answered.some(a => a === null || a === 'wrong-attempt');
+    if (hasUnanswered) {
+      const firstOpen = answered.findIndex(a => a === null || a === 'wrong-attempt');
+      currentQ = firstOpen;
+      renderQuestion();
+    } else {
+      showWin();
+    }
+  }
 }
 
 // ── Render question ──
 function renderQuestion() {
   const q = QUESTIONS[currentQ];
-  const alreadyAnswered = answered[currentQ] !== null;
+  const alreadyAnswered = answered[currentQ] !== null && answered[currentQ] !== 'wrong-attempt' && answered[currentQ] !== 'pending';
 
   // Header
   document.getElementById('q-num').textContent = 'Q ' + (currentQ + 1) + ' / 16';
@@ -1352,16 +1684,23 @@ function renderQuestion() {
     fb.style.display = 'none';
   }
 
-  // Next button
+  // Next / End Game button
   const nextBtn = document.getElementById('next-btn');
-  nextBtn.style.display = (alreadyAnswered && currentQ < 15) ? 'inline-block' : 'none';
-
-  // Skip button — always visible on unanswered questions (except last)
-  const skipFwdBtn = document.getElementById('skip-q-btn');
-  if (skipFwdBtn) {
-    skipFwdBtn.style.display = (!alreadyAnswered && currentQ < 15) ? 'inline-block' : 'none';
-    skipFwdBtn.textContent = 'SKIP >';
+  const endBtn = document.getElementById('end-game-btn');
+  if (alreadyAnswered) {
+    if (currentQ < 15) {
+      nextBtn.style.display = 'inline-block';
+      if (endBtn) endBtn.style.display = 'none';
+    } else {
+      // Q16 answered — show End Game, hide Next
+      nextBtn.style.display = 'none';
+      if (endBtn) endBtn.style.display = 'inline-block';
+    }
+  } else {
+    nextBtn.style.display = 'none';
+    if (endBtn) endBtn.style.display = 'none';
   }
+
 
   // Hide try-again on fresh load
   const tryAgainBtn = document.getElementById('try-again-btn');
@@ -1379,11 +1718,31 @@ function renderMC(q, disabled) {
   q.options.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.className = 'mc-btn';
-    btn.innerHTML = '<strong>' + String.fromCharCode(65 + i) + ')</strong> ' + escHtml(opt);
+
+    const isCode = opt.includes('\n');
+    if (isCode) {
+      // Render as labelled code block
+      const label = document.createElement('span');
+      label.className = 'opt-label';
+      label.textContent = String.fromCharCode(65 + i) + ')';
+      const pre = document.createElement('pre');
+      pre.className = 'opt-code';
+      pre.textContent = opt;
+      btn.appendChild(label);
+      btn.appendChild(pre);
+    } else {
+      btn.innerHTML = '<strong>' + String.fromCharCode(65 + i) + ')</strong> ' + escHtml(opt);
+    }
+
     if (disabled) {
       btn.disabled = true;
-      if (i === q.answer) btn.classList.add('correct');
-      else if (studentAnswers[currentQ] == i) btn.classList.add('wrong');
+      const wasCorrect = answered[currentQ] === true;
+      if (wasCorrect && i === q.answer) {
+        btn.classList.add('correct');  // show correct only when they got it right
+      } else if (studentAnswers[currentQ] == i && !wasCorrect) {
+        btn.classList.add('wrong');    // show their wrong choice
+      }
+      // On wrong attempt: other options stay neutral — correct not revealed
     } else {
       btn.addEventListener('click', () => submitMC(i, q));
     }
@@ -1498,9 +1857,41 @@ function renderFR(q, disabled) {
   }
 }
 
+// ── Generate a MC hint without revealing the correct answer ──
+function generateHint(q, chosen) {
+  // Use q.hint if provided, otherwise fall back to a generic nudge
+  if (q.hints && q.hints[chosen] !== undefined) {
+    return q.hints[chosen];
+  }
+  // Generic hints based on question type
+  const chosenText = q.options[chosen] || '';
+  if (chosenText.includes('// all done') || chosenText.includes('// done') || chosenText.includes('// seats ready') || chosenText.includes('// black by default')) {
+    return 'Remember: declaring a 2D object array only creates null slots — each object still needs to be constructed individually.';
+  }
+  if (chosenText.includes('arr.rows') || chosenText.includes('.size()') || chosenText.includes('[3,4]') || chosenText.includes('[3,3]')) {
+    return 'Check the Java syntax carefully — is that a valid way to declare or measure an array in Java?';
+  }
+  if (chosenText.includes('result[0]')) {
+    return 'Think about which index should store the sum for each row — should it always be 0?';
+  }
+  if (chosenText.includes('arr[c][r]') || chosenText.includes('result[r][c] = arr[c][r]')) {
+    return 'That formula is a transpose, not a 90° clockwise rotation — think about where each element needs to land.';
+  }
+  if (chosenText.includes('< max') || chosenText.includes('< max.')) {
+    return 'Check your comparison direction — are you finding the maximum or the minimum?';
+  }
+  if (chosenText.includes('>= passMark') || chosenText.includes('>= threshold') || chosenText.includes('>= ' + (q._thresh||'__'))) {
+    return 'Check the comparison operator — should passing be strictly greater than, or greater than or equal to?';
+  }
+  if (chosenText.includes('int sum') && !chosenText.includes('double')) {
+    return 'Think about the return type — will integer arithmetic give you the right result here?';
+  }
+  return 'Think about what this option is doing step by step — does it handle every case correctly?';
+}
+
 // ── Submit multiple choice ──
 function submitMC(chosen, q) {
-  if (answered[currentQ] !== null) return;
+  if (answered[currentQ] !== null && answered[currentQ] !== 'skipped') return;
   studentAnswers[currentQ] = chosen;
   const correct = chosen === q.answer;
   answered[currentQ] = correct;
@@ -1511,74 +1902,140 @@ function submitMC(chosen, q) {
   renderMC(q, true);
 
   const fb = document.getElementById('feedback-box');
-  const cls = correct ? 'correct' : 'wrong';
-  const text = (correct ? '✓ Correct! ' : '✗ Not quite. ') + q.explanation;
+  let cls, text;
+  if (correct) {
+    cls = 'correct';
+    text = '✓ Correct! ' + q.explanation;
+  } else {
+    cls = 'wrong';
+    // Give a hint that doesn't reveal the answer
+    text = '✗ Not quite. ' + generateHint(q, chosen);
+  }
   fb.className = 'feedback-box ' + cls;
   fb.textContent = text;
   fb.style.display = 'block';
   feedbacks[currentQ] = { cls, text };
 
   const nextBtn = document.getElementById('next-btn');
-  if (currentQ < 15) nextBtn.style.display = 'inline-block';
+  const tryAgainBtn = document.getElementById('try-again-btn');
+  const endBtn = document.getElementById('end-game-btn');
+  if (correct) {
+    if (currentQ < 15) {
+      nextBtn.style.display = 'inline-block';
+      if (endBtn) endBtn.style.display = 'none';
+    } else {
+      nextBtn.style.display = 'none';
+      if (endBtn) endBtn.style.display = 'inline-block';
+    }
+    if (tryAgainBtn) tryAgainBtn.style.display = 'none';
+  } else {
+    if (tryAgainBtn) tryAgainBtn.style.display = 'inline-block';
+    nextBtn.style.display = 'none';
+    if (endBtn) endBtn.style.display = 'none';
+  }
   checkWin();
 }
 
-// ── Submit free response (self-check rubric) ──
+// ── Submit free response ──
 function submitFR(q, btn) {
+  if (answered[currentQ] !== null && answered[currentQ] !== 'skipped' && answered[currentQ] !== 'wrong-attempt') return;
+
   const input = document.getElementById('fr-input');
   const code = input ? input.value.trim() : '';
   if (!code) { alert('Please write your answer before submitting.'); return; }
 
+  if (btn) { btn.disabled = true; btn.textContent = 'SUBMITTED'; }
+
   studentAnswers[currentQ] = code;
-  answered[currentQ] = true;
-  score++;
-  updateScore();
-  revealTile(currentQ, true);
+  // Mark as pending — not yet scored until student confirms
+  answered[currentQ] = 'pending';
+
+  // Clear and re-render the (now disabled) editor
+  document.getElementById('q-input-area').innerHTML = '';
   renderFR(q, true);
 
-  // Format rubric as a self-check checklist
+  // Build feedback panel: rubric checklist + model answer
   const points = q.rubric.split(/\.\s+(?=[A-Z])/).map(s => s.trim().replace(/\.+$/, '')).filter(s => s.length > 4);
   const rubricHtml = '<strong style="font-size:17px;color:#ffd97d;display:block;margin-bottom:8px;">SELF-CHECK — does your code...</strong>' +
     points.map(p => '&bull; ' + p + '.').join('<br>');
 
+  let modelHtml = '';
+  if (q.modelAnswer) {
+    modelHtml = '<div class="model-answer-wrap">' +
+      '<span class="model-answer-label">MODEL ANSWER:</span>' +
+      '<pre class="code-block" style="margin:0;">' + escHtml(q.modelAnswer) + '</pre>' +
+      '</div>';
+  }
+
+  const fullHtml = rubricHtml + (modelHtml ? '<br>' + modelHtml : '');
+
+  // Buttons: Mark as Correct and Try Again
+  const markBtn = '<button class="mark-correct-btn" onclick="markFRCorrect()">✓ MARK AS CORRECT</button>';
+
   const fb = document.getElementById('feedback-box');
   fb.className = 'feedback-box partial';
-  fb.innerHTML = rubricHtml;
+  fb.innerHTML = fullHtml + '<br><br>' + markBtn;
   fb.style.display = 'block';
-  feedbacks[currentQ] = { cls: 'partial', html: rubricHtml };
+  feedbacks[currentQ] = { cls: 'partial', html: fullHtml + '<br><br>' + markBtn };
+
+  // Hide next/end/skip — student must choose Mark Correct or Try Again
+  const nextBtn = document.getElementById('next-btn');
+  const tryAgainBtn = document.getElementById('try-again-btn');
+  const endBtn = document.getElementById('end-game-btn');
+  if (nextBtn) nextBtn.style.display = 'none';
+  if (endBtn) endBtn.style.display = 'none';
+  if (tryAgainBtn) tryAgainBtn.style.display = 'inline-block';
+}
+
+function markFRCorrect() {
+  answered[currentQ] = true;
+  score++;
+  updateScore();
+  revealTile(currentQ, true);
+
+  // Replace mark button with correct feedback
+  const fb = document.getElementById('feedback-box');
+  // Remove the mark button from the HTML
+  fb.innerHTML = fb.innerHTML.replace(/<br><br><button[^>]*>.*?<\/button>/s, '');
+  fb.className = 'feedback-box correct';
+
+  feedbacks[currentQ] = { cls: 'correct', html: fb.innerHTML };
 
   const nextBtn = document.getElementById('next-btn');
   const tryAgainBtn = document.getElementById('try-again-btn');
-  const skipBtn = document.getElementById('skip-q-btn');
-  if (nextBtn && currentQ < 15) nextBtn.style.display = 'inline-block';
-  if (tryAgainBtn) tryAgainBtn.style.display = 'inline-block';
-  if (skipBtn) skipBtn.style.display = 'none';
+  const endBtn = document.getElementById('end-game-btn');
+  if (tryAgainBtn) tryAgainBtn.style.display = 'none';
+  if (currentQ < 15) {
+    if (nextBtn) nextBtn.style.display = 'inline-block';
+    if (endBtn) endBtn.style.display = 'none';
+  } else {
+    if (nextBtn) nextBtn.style.display = 'none';
+    if (endBtn) endBtn.style.display = 'inline-block';
+  }
   checkWin();
 }
 
 
 // ── Try again / skip ──
 function tryAgain() {
-  answered[currentQ] = null;
+  if (answered[currentQ] === true) {
+    score = Math.max(0, score - 1);
+    updateScore();
+  }
+  const q = QUESTIONS[currentQ];
+  // FR wrong: mark as 'wrong-attempt' so it resets to fresh next visit
+  answered[currentQ] = (q.type === 'fr') ? 'wrong-attempt' : null;
   studentAnswers[currentQ] = '';
   feedbacks[currentQ] = null;
   const tile = tileElements[currentQ];
   if (tile) tile.classList.remove('revealed','answered-correct','answered-wrong');
   document.getElementById('try-again-btn').style.display = 'none';
-  document.getElementById('skip-q-btn').style.display = 'none';
   document.getElementById('next-btn').style.display = 'none';
+  const egBtn = document.getElementById('end-game-btn');
+  if (egBtn) egBtn.style.display = 'none';
   renderQuestion();
 }
 
-function skipQuestion() {
-  if (answered[currentQ] === null) {
-    answered[currentQ] = false;
-    revealTile(currentQ, false);
-  }
-  document.getElementById('try-again-btn').style.display = 'none';
-  document.getElementById('skip-q-btn').style.display = 'none';
-  nextQuestion();
-}
 
 // ── Tile reveal ──
 function revealTile(index, success) {
@@ -1596,8 +2053,13 @@ function updateScore() {
 
 // ── Check win condition ──
 function checkWin() {
-  const allAnswered = answered.every(a => a !== null);
-  if (allAnswered) setTimeout(showWin, 800);
+  // Auto-win only when every question is truly answered (not skipped)
+  const allAnswered = answered.every(a => a !== null && a !== 'wrong-attempt' && a !== 'pending');
+  if (allAnswered) {
+    // If on last question, End Game button already shown — don't auto-advance
+    if (currentQ === 15) return;
+    setTimeout(showWin, 800);
+  }
 }
 
 // ── Win screen ──
@@ -1717,6 +2179,153 @@ function launchConfetti() {
 // ── Utility ──
 function escHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+
+// ── Teacher mode ──
+let teacherMode = false;
+const TEACHER_PASSWORDS = ['Denna', 'DeSteph'];
+
+function openPwModal() {
+  document.getElementById('pw-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('pw-input').focus(), 50);
+}
+
+function closePwModal() {
+  document.getElementById('pw-modal').style.display = 'none';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-error').style.display = 'none';
+}
+
+function checkPassword() {
+  const val = document.getElementById('pw-input').value.trim();
+  if (TEACHER_PASSWORDS.includes(val)) {
+    closePwModal();
+    enterTeacherMode();
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+function enterTeacherMode() {
+  teacherMode = true;
+  // Build fresh questions so teacher sees a full set
+  pixelArtIndex = Math.floor(Math.random() * PIXEL_ART_POOL.length);
+  PIXEL_ART = PIXEL_ART_POOL[pixelArtIndex].grid;
+  PALETTE   = PIXEL_ART_POOL[pixelArtIndex].palette;
+  QUESTIONS = buildQuestions();
+
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('game-wrapper').style.display = 'none';
+  document.getElementById('teacher-sheet').style.display = 'block';
+
+  buildTeacherSheet();
+}
+
+function exitTeacherMode() {
+  teacherMode = false;
+  document.getElementById('teacher-sheet').style.display = 'none';
+  document.getElementById('start-screen').style.display = 'flex';
+}
+
+function buildTeacherSheet() {
+  const nav = document.getElementById('teacher-nav');
+  const container = document.getElementById('teacher-questions');
+  nav.innerHTML = '';
+  container.innerHTML = '';
+
+  const diffGroups = [
+    { key: 'easy',   label: 'Easy Q1-4'   },
+    { key: 'medium', label: 'Medium Q5-8' },
+    { key: 'hard',   label: 'Hard Q9-12'  },
+    { key: 'oop',    label: 'OOP Q13-16'  },
+  ];
+
+  diffGroups.forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 't-nav-btn';
+    btn.textContent = g.label;
+    btn.onclick = () => {
+      const el = document.getElementById('t-group-' + g.key);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    nav.appendChild(btn);
+  });
+
+  // Group header anchors
+  const seenDiff = new Set();
+
+  QUESTIONS.forEach((q, i) => {
+    if (!seenDiff.has(q.diff)) {
+      seenDiff.add(q.diff);
+      const anchor = document.createElement('div');
+      anchor.id = 't-group-' + q.diff;
+      anchor.style.cssText = 'font-family:"Press Start 2P",monospace;font-size:9px;color:#6060a0;padding:0.5rem 0 0.25rem;margin-top:0.5rem;letter-spacing:1px;';
+      const labels = { easy:'── EASY ──', medium:'── MEDIUM ──', hard:'── HARD ──', oop:'── OOP BOSS ──' };
+      anchor.textContent = labels[q.diff] || q.diff.toUpperCase();
+      container.appendChild(anchor);
+    }
+
+    const card = document.createElement('div');
+    card.className = 'teacher-q-card diff-' + q.diff;
+
+    // Header row
+    const hdr = document.createElement('div');
+    hdr.className = 't-q-header';
+    hdr.innerHTML = '<span class="t-q-num">Q' + (i+1) + '</span><span class="diff-badge ' + q.diff + '">' +
+      ({easy:'EASY',medium:'MEDIUM',hard:'HARD',oop:'OOP BOSS'}[q.diff]||q.diff) + '</span>';
+    card.appendChild(hdr);
+
+    // Code block if present
+    if (q.code && q.code.trim()) {
+      const pre = document.createElement('pre');
+      pre.className = 'code-block';
+      pre.style.marginBottom = '0.75rem';
+      pre.textContent = q.code;
+      card.appendChild(pre);
+    }
+
+    // Question text
+    const qtxt = document.createElement('div');
+    qtxt.className = 't-q-text';
+    qtxt.textContent = q.text;
+    card.appendChild(qtxt);
+
+    if (q.type === 'mc') {
+      // Options with correct highlighted
+      const opts = document.createElement('div');
+      opts.className = 't-options';
+      q.options.forEach((opt, oi) => {
+        const d = document.createElement('div');
+        d.className = 't-opt' + (oi === q.answer ? ' correct-ans' : '');
+        d.textContent = String.fromCharCode(65+oi) + ') ' + opt;
+        opts.appendChild(d);
+      });
+      card.appendChild(opts);
+
+      // Explanation
+      if (q.explanation) {
+        const exp = document.createElement('div');
+        exp.className = 't-explanation';
+        exp.textContent = 'Explanation: ' + q.explanation;
+        card.appendChild(exp);
+      }
+    } else {
+      // FR question — show rubric
+      if (q.rubric) {
+        const rub = document.createElement('div');
+        rub.className = 't-rubric';
+        const points = q.rubric.split(/\.\s+(?=[A-Z])/).map(s => s.trim().replace(/\.+$/, '')).filter(s => s.length > 4);
+        rub.innerHTML = '<strong style="color:#e0c0ff;display:block;margin-bottom:6px;">Grading rubric:</strong>' +
+          points.map(p => '• ' + p + '.').join('<br>');
+        card.appendChild(rub);
+      }
+    }
+
+    container.appendChild(card);
+  });
 }
 
 // ── Init: game starts from startGame() via the start screen ──
