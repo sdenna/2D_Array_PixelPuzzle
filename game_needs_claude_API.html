@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>2D Array Challenge — Self-Check Version</title>
+  <title>2D Array Challenge — Java Review Game</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -641,17 +641,27 @@
     <div class="start-title">[ 2D ARRAY<br>CHALLENGE ]</div>
     <div class="start-sub">Java review — reveal the hidden pixel art!</div>
 
-    <p class="api-hint" style="text-align:center; margin-bottom:1.5rem;">
-      Write your Java code answers and check them against the rubric.<br>Be honest — the learning is up to you!
+    <label class="api-label" for="api-key-input">ANTHROPIC API KEY</label>
+    <div class="api-input-wrap">
+      <input class="api-input" type="password" id="api-key-input"
+        placeholder="sk-ant-..." autocomplete="off" />
+      <button class="api-toggle" id="api-toggle-btn" onclick="toggleApiVis()" title="Show/hide key">&#128065;</button>
+    </div>
+    <p class="api-hint">
+      Required for AI grading of free-response questions.
+      Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
+      Your key is never stored or sent anywhere except directly to Anthropic.
     </p>
+
     <button class="start-btn" onclick="startGame()">START GAME</button>
+    <span class="skip-link" onclick="startGame(true)">Skip — disable AI grading (MC only)</span>
   </div>
 </div>
 
 <div class="wrapper" id="game-wrapper" style="display:none;">
   <div class="header">
     <div class="header-title">[ 2D ARRAY CHALLENGE ]</div>
-    <div class="header-sub">Write your answers — check them against the rubric!</div>
+    <div class="header-sub">Answer correctly to reveal the hidden pixel art!</div>
   </div>
 
   <div class="main-layout" id="main-layout">
@@ -1345,8 +1355,7 @@ function renderQuestion() {
   const fb = document.getElementById('feedback-box');
   if (alreadyAnswered && feedbacks[currentQ]) {
     fb.className = 'feedback-box ' + feedbacks[currentQ].cls;
-    if (feedbacks[currentQ].html) fb.innerHTML = feedbacks[currentQ].html;
-    else fb.textContent = feedbacks[currentQ].text || '';
+    fb.textContent = feedbacks[currentQ].text;
     fb.style.display = 'block';
   } else {
     fb.style.display = 'none';
@@ -1355,17 +1364,6 @@ function renderQuestion() {
   // Next button
   const nextBtn = document.getElementById('next-btn');
   nextBtn.style.display = (alreadyAnswered && currentQ < 15) ? 'inline-block' : 'none';
-
-  // Skip button — always visible on unanswered questions (except last)
-  const skipFwdBtn = document.getElementById('skip-q-btn');
-  if (skipFwdBtn) {
-    skipFwdBtn.style.display = (!alreadyAnswered && currentQ < 15) ? 'inline-block' : 'none';
-    skipFwdBtn.textContent = 'SKIP >';
-  }
-
-  // Hide try-again on fresh load
-  const tryAgainBtn = document.getElementById('try-again-btn');
-  if (tryAgainBtn) tryAgainBtn.style.display = 'none';
 
   // Tile highlight
   tileElements.forEach((t, i) => t.classList.toggle('active', i === currentQ));
@@ -1492,7 +1490,11 @@ function renderFR(q, disabled) {
     btn.addEventListener('click', () => submitFR(q, btn));
     actionRow.appendChild(btn);
 
-    // No AI grading indicator in self-check version
+    const grading = document.createElement('span');
+    grading.className = 'grading-indicator';
+    grading.id = 'grading-indicator';
+    grading.innerHTML = '<span class="blink">Grading with AI</span>...';
+    actionRow.appendChild(grading);
 
     inputArea.appendChild(actionRow);
   }
@@ -1523,47 +1525,120 @@ function submitMC(chosen, q) {
   checkWin();
 }
 
-// ── Submit free response (self-check rubric) ──
-function submitFR(q, btn) {
+// ── Submit free response (AI graded) ──
+async function submitFR(q, btn) {
   const input = document.getElementById('fr-input');
   const code = input ? input.value.trim() : '';
   if (!code) { alert('Please write your answer before submitting.'); return; }
 
-  studentAnswers[currentQ] = code;
-  answered[currentQ] = true;
-  score++;
-  updateScore();
-  revealTile(currentQ, true);
-  renderFR(q, true);
+  // mcOnlyMode: no API key — show model answer for self-check
+  if (mcOnlyMode) {
+    studentAnswers[currentQ] = code;
+    answered[currentQ] = true;  // count as correct for progress (self-graded)
+    score++;
+    updateScore();
+    revealTile(currentQ, true);
+    renderFR(q, true);
+    const fb = document.getElementById('feedback-box');
+    fb.className = 'feedback-box partial';
+    fb.textContent = 'No API key — self-check mode. Review the rubric: ' + q.rubric;
+    fb.style.display = 'block';
+    feedbacks[currentQ] = { cls: 'partial', text: fb.textContent };
+    if (currentQ < 15) document.getElementById('next-btn').style.display = 'inline-block';
+    checkWin();
+    return;
+  }
 
-  // Format rubric as a self-check checklist
-  const points = q.rubric.split(/\.\s+(?=[A-Z])/).map(s => s.trim().replace(/\.+$/, '')).filter(s => s.length > 4);
-  const rubricHtml = '<strong style="font-size:17px;color:#ffd97d;display:block;margin-bottom:8px;">SELF-CHECK — does your code...</strong>' +
-    points.map(p => '&bull; ' + p + '.').join('<br>');
+  btn.disabled = true;
+  btn.textContent = 'SUBMITTING...';
+  const indicator = document.getElementById('grading-indicator');
+  if (indicator) indicator.classList.add('active');
 
-  const fb = document.getElementById('feedback-box');
-  fb.className = 'feedback-box partial';
-  fb.innerHTML = rubricHtml;
-  fb.style.display = 'block';
-  feedbacks[currentQ] = { cls: 'partial', html: rubricHtml };
+  const prompt = `You are a Java computer science teacher grading a student's answer about 2D arrays.
 
-  const nextBtn = document.getElementById('next-btn');
-  const tryAgainBtn = document.getElementById('try-again-btn');
-  const skipBtn = document.getElementById('skip-q-btn');
-  if (nextBtn && currentQ < 15) nextBtn.style.display = 'inline-block';
-  if (tryAgainBtn) tryAgainBtn.style.display = 'inline-block';
-  if (skipBtn) skipBtn.style.display = 'none';
-  checkWin();
+Question: ${q.text}
+${q.code ? 'Code provided to student:\n' + q.code + '\n' : ''}
+Grading rubric: ${q.rubric}
+
+Student's answer:
+${code}
+
+The method signature/header is OPTIONAL — the student does not need to include it. Grade only the body/logic of the method. Also note: using arr[0].length for the column count in nested loops is perfectly correct and preferred in this class (all arrays are rectangular).
+
+Respond in 3-5 sentences maximum. Start your response with exactly one of these words: CORRECT, PARTIAL, or INCORRECT (in all caps). Then briefly explain what the student got right, what's missing or wrong, and give one concrete tip. Be encouraging but honest. Write for a high school student.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 350,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content || []).map(b => b.text || '').join('').trim() || 'Grading failed — please try again.';
+
+    studentAnswers[currentQ] = code;
+    const isCorrect = text.startsWith('CORRECT');
+    const isPartial = text.startsWith('PARTIAL');
+    answered[currentQ] = isCorrect;
+
+    if (isCorrect) { score++; updateScore(); }
+    revealTile(currentQ, isCorrect || isPartial);
+
+    renderFR(q, true);
+
+    const cls = isCorrect ? 'correct' : (isPartial ? 'partial' : 'wrong');
+    const fb = document.getElementById('feedback-box');
+    fb.className = 'feedback-box ' + cls;
+    fb.textContent = text;
+    fb.style.display = 'block';
+    feedbacks[currentQ] = { cls, text };
+
+    const nextBtn = document.getElementById('next-btn');
+    const tryAgainBtn = document.getElementById('try-again-btn');
+    const skipBtn = document.getElementById('skip-q-btn');
+    if (isCorrect) {
+      if (currentQ < 15) nextBtn.style.display = 'inline-block';
+      if (tryAgainBtn) tryAgainBtn.style.display = 'none';
+      if (skipBtn) skipBtn.style.display = 'none';
+    } else {
+      // Wrong or partial — offer try again and skip
+      if (tryAgainBtn) tryAgainBtn.style.display = 'inline-block';
+      if (skipBtn) skipBtn.style.display = 'inline-block';
+      if (currentQ < 15) nextBtn.style.display = 'inline-block';
+    }
+    checkWin();
+  } catch (err) {
+    if (indicator) indicator.classList.remove('active');
+    btn.disabled = false;
+    btn.textContent = 'SUBMIT ANSWER';
+    const fb = document.getElementById('feedback-box');
+    fb.className = 'feedback-box wrong';
+    fb.textContent = 'Could not reach the grader. Check your internet connection and try again.';
+    fb.style.display = 'block';
+  }
 }
-
 
 // ── Try again / skip ──
 function tryAgain() {
+  // Reset just this question so the student can resubmit
   answered[currentQ] = null;
   studentAnswers[currentQ] = '';
   feedbacks[currentQ] = null;
+  // Un-reveal the tile
   const tile = tileElements[currentQ];
-  if (tile) tile.classList.remove('revealed','answered-correct','answered-wrong');
+  if (tile) {
+    tile.classList.remove('revealed','answered-correct','answered-wrong');
+  }
+  // Hide try-again/skip, re-render the question fresh
   document.getElementById('try-again-btn').style.display = 'none';
   document.getElementById('skip-q-btn').style.display = 'none';
   document.getElementById('next-btn').style.display = 'none';
@@ -1571,6 +1646,7 @@ function tryAgain() {
 }
 
 function skipQuestion() {
+  // Mark as answered-wrong (null tile stays hidden) and move on
   if (answered[currentQ] === null) {
     answered[currentQ] = false;
     revealTile(currentQ, false);
@@ -1629,7 +1705,9 @@ function toggleApiVis() {
 }
 
 function startGame(skipMode) {
-  mcOnlyMode = true;
+  const inp = document.getElementById('api-key-input');
+  apiKey = inp ? inp.value.trim() : '';
+  mcOnlyMode = !!skipMode || !apiKey;
 
   // Pick a random pixel art image each time
   pixelArtIndex = Math.floor(Math.random() * PIXEL_ART_POOL.length);
