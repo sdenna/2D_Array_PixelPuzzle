@@ -165,25 +165,53 @@
     .mc-btn.wrong    { border-color: #ff6060; background: #2a0808; color: #ff9090; }
     .mc-btn:disabled { cursor: default; }
 
-    /* ── Free response ── */
-    textarea.free-response {
-      width: 100%;
-      min-height: 120px;
+    /* ── Free response editor ── */
+    .editor-wrap {
+      display: flex;
       background: #050510;
       border: 1.5px solid #303060;
       border-radius: 6px;
+      margin-bottom: 0.75rem;
+      transition: border-color 0.15s;
+      overflow: hidden;
+    }
+    .editor-wrap:focus-within { border-color: #7070ff; }
+    .editor-wrap.disabled { opacity: 0.6; }
+
+    .line-nums {
+      min-width: 36px;
+      padding: 0.75rem 0.4rem 0.75rem 0.5rem;
+      background: #0a0a1e;
+      border-right: 1px solid #202050;
+      color: #4040a0;
+      font-family: 'VT323', monospace;
+      font-size: 19px;
+      line-height: 1.5;
+      text-align: right;
+      user-select: none;
+      pointer-events: none;
+      overflow: hidden;
+      flex-shrink: 0;
+      white-space: pre;
+    }
+
+    textarea.free-response {
+      flex: 1;
+      min-height: 120px;
+      background: transparent;
+      border: none;
+      outline: none;
       color: #7dffb3;
       font-family: 'VT323', monospace;
       font-size: 19px;
-      padding: 0.75rem;
+      padding: 0.75rem 0.75rem 0.75rem 0.6rem;
       resize: vertical;
-      margin-bottom: 0.75rem;
-      transition: border-color 0.15s;
       line-height: 1.5;
+      overflow-y: auto;
+      overflow-x: auto;
     }
 
-    textarea.free-response:focus { outline: none; border-color: #7070ff; }
-    textarea.free-response:disabled { opacity: 0.6; }
+    textarea.free-response:disabled { cursor: default; }
 
     .action-row {
       display: flex;
@@ -223,6 +251,36 @@
     }
 
     .next-btn:hover { background: #280f55; }
+
+    .try-again-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      background: #2a1000;
+      border: 2px solid #ff9d4d;
+      color: #ff9d4d;
+      padding: 11px 22px;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.15s;
+      display: none;
+    }
+    .try-again-btn:hover { background: #3a1800; }
+
+    .skip-q-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      background: #1a1a1a;
+      border: 2px solid #606060;
+      color: #909090;
+      padding: 11px 22px;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.15s;
+      display: none;
+    }
+    .skip-q-btn:hover { background: #282828; }
 
     /* ── Feedback ── */
     .feedback-box {
@@ -620,6 +678,8 @@
       <div class="feedback-box" id="feedback-box"></div>
       <div class="action-row" id="action-row" style="margin-top:0.75rem;">
         <button class="next-btn" id="next-btn" onclick="nextQuestion()">NEXT &gt;&gt;</button>
+        <button class="try-again-btn" id="try-again-btn" onclick="tryAgain()">TRY AGAIN</button>
+        <button class="skip-q-btn" id="skip-q-btn" onclick="skipQuestion()">SKIP &gt;</button>
       </div>
     </div>
 
@@ -1053,7 +1113,7 @@ function getOopSet(artIdx, clsOverride) {
           rubric:`Init maxCell = grid[0][0], iterate all cells comparing getValue() — accept both traditional nested for loops and for-each loops. Update maxCell when strictly greater, return maxCell. Header optional. Partial credit for correct comparison logic.`
         },
         q15: { id:15, diff:'oop', type:'fr',
-          text:`FINAL BOSS — write TWO methods:\n\n1) Count cells whose value exceeds ${thresh}:\n   public static int countAbove(${cls}[][] grid, int threshold)\n\n2) Double every cell whose value exceeds ${thresh}:\n   public static void doubleAbove(${cls}[][] grid, int threshold)`,
+          text:`FINAL BOSS — write TWO methods:\n\nUse the parameter threshold (not a hardcoded number) as the cutoff in both methods.\n\n1) Count cells whose value exceeds the threshold:\n   public static int countAbove(${cls}[][] grid, int threshold)\n\n2) Double every cell whose value exceeds the threshold:\n   public static void doubleAbove(${cls}[][] grid, int threshold)`,
           rubric:`countAbove: iterate all cells (traditional or for-each), getValue(), compare to threshold, counter, return. doubleAbove: iterate all cells (traditional or for-each), getValue() to check, setValue(cell.getValue()*2) to update. Grade each method independently. Header optional.`
         }
       };
@@ -1077,7 +1137,7 @@ function getOopSet(artIdx, clsOverride) {
           explanation:`new ${cls}[${sz}][${sz}] creates ${sz*sz} null slots — each ${cls} must be constructed individually in the loop.`
         },
         q13: { id:13, diff:'oop', type:'fr',
-          text:`Using the ${cls} class (getGrade() / setGrade()), write a method that counts how many students in the grid have a passing grade (grade >= ${passMark}).\n\nMethod signature:\npublic static int countPassing(${cls}[][] roster, int passMark)`,
+          text:`Using the ${cls} class (getGrade() / setGrade()), write a method that counts how many students in the grid have a passing grade.\n\nUse the parameter passMark (not a hardcoded number) as the threshold.\n\nMethod signature:\npublic static int countPassing(${cls}[][] roster, int passMark)`,
           rubric:`Iterate all students (traditional nested loops OR for-each: for ${cls}[] row : roster, for ${cls} s : row), call getGrade(), compare >= passMark, increment counter, return count. Header optional.`
         },
         q14: { id:14, diff:'oop', type:'fr',
@@ -1085,7 +1145,7 @@ function getOopSet(artIdx, clsOverride) {
           rubric:`Sum all getGrade() values by iterating all students (traditional or for-each loops both fine), divide by total count (roster.length * roster[0].length) as double — watch for integer division. Header optional.`
         },
         q15: { id:15, diff:'oop', type:'fr',
-          text:`FINAL BOSS — write TWO methods:\n\n1) Add a ${bonus}-point bonus to every student whose grade is below ${passMark} (but don't exceed 100):\n   public static void applyBonus(${cls}[][] roster, int passMark, int bonus)\n\n2) Return the ${cls} object with the highest grade:\n   public static ${cls} topStudent(${cls}[][] roster)`,
+          text:`FINAL BOSS — write TWO methods:\n\n1) Add points to every student whose grade is below the threshold. Use the parameters passMark and bonus (not hardcoded numbers). Cap at 100.\n   public static void applyBonus(${cls}[][] roster, int passMark, int bonus)\n\n2) Return the ${cls} object with the highest grade:\n   public static ${cls} topStudent(${cls}[][] roster)`,
           rubric:`applyBonus: iterate all students (for-each fine here), getGrade() < passMark check, setGrade(Math.min(100, getGrade()+bonus)). topStudent: must use index-based loops OR track max via reference — init max = roster[0][0], compare getGrade(), return max. Grade each method independently. Header optional.`
         }
       };
@@ -1116,7 +1176,7 @@ function getOopSet(artIdx, clsOverride) {
           rubric:`Iterate all seats (traditional or for-each), call isOccupied() on each ${cls}, count those that return false, return count. Header optional. Partial credit for correct loop structure.`
         },
         q15: { id:15, diff:'oop', type:'fr',
-          text:`FINAL BOSS — write TWO methods:\n\n1) Mark every seat in a given row as occupied:\n   public static void fillRow(${cls}[][] seats, int row)\n\n2) Return true if the entire grid is sold out (all seats occupied), false otherwise:\n   public static boolean isSoldOut(${cls}[][] seats)`,
+          text:`FINAL BOSS — write TWO methods:\n\n1) Mark every seat in the specified row as occupied. Use the parameter row (not a hardcoded number) as the row index.\n   public static void fillRow(${cls}[][] seats, int row)\n\n2) Return true if every seat in the grid is occupied, false otherwise:\n   public static boolean isSoldOut(${cls}[][] seats)`,
           rubric:`fillRow: loop over the specified row — traditional for loop required since row index is given (for-each over seats[row] also fine). setOccupied(true) on each. isSoldOut: nested loops (traditional or for-each), if any isOccupied() returns false return false immediately, return true after loops. Grade each independently. Header optional.`
         }
       };
@@ -1141,7 +1201,7 @@ function getOopSet(artIdx, clsOverride) {
           explanation:`Array declaration gives you ${sz*sz} null references. Each ${cls} must be explicitly constructed with new ${cls}(0,0,0) in the loop.`
         },
         q13: { id:13, diff:'oop', type:'fr',
-          text:`Using the ${cls} class, write a method that counts how many pixels have a ${channel} value greater than ${thresh}.\n\nMethod signature:\npublic static int countBright${capMethod}(${cls}[][] img)`,
+          text:`Using the ${cls} class, write a method that counts how many pixels have a ${channel} value greater than ${thresh}.\n\nNote: the threshold ${thresh} is baked into the method — no parameter needed. Use ${thresh} directly in your comparison.\n\nMethod signature:\npublic static int countBright${capMethod}(${cls}[][] img)`,
           rubric:`Iterate all pixels (traditional nested loops OR for-each: for ${cls}[] row : img, for ${cls} p : row), call get${capMethod}() on each ${cls}, compare > ${thresh}, increment counter, return. Header optional.`
         },
         q14: { id:14, diff:'oop', type:'fr',
@@ -1149,7 +1209,7 @@ function getOopSet(artIdx, clsOverride) {
           rubric:`Iterate all pixels (traditional or for-each both fine — no index needed here), call set${capMethod}(0) on every pixel. No return value needed. Header optional.`
         },
         q15: { id:15, diff:'oop', type:'fr',
-          text:`FINAL BOSS — write TWO methods:\n\n1) Return the average ${channel} value across all pixels as a double:\n   public static double avg${capMethod}(${cls}[][] img)\n\n2) Clamp the ${channel} channel of every pixel so it does not exceed a given max:\n   public static void clamp${capMethod}(${cls}[][] img, int max)`,
+          text:`FINAL BOSS — write TWO methods:\n\n1) Return the average ${channel} value across all pixels as a double:\n   public static double avg${capMethod}(${cls}[][] img)\n\n2) Set the ${channel} channel of any pixel that exceeds the limit down to the limit. Use the parameter max (not a hardcoded number).\n   public static void clamp${capMethod}(${cls}[][] img, int max)`,
           rubric:`avg${capMethod}: sum get${capMethod}() for all pixels (for-each fine), divide by img.length*img[0].length as double — watch integer division. clamp${capMethod}: iterate all pixels (traditional or for-each), if get${capMethod}() > max call set${capMethod}(max). Grade each independently. Header optional.`
         }
       };
@@ -1330,8 +1390,25 @@ function renderMC(q, disabled) {
   inputArea.appendChild(wrap);
 }
 
+function updateLineNums(ta, gutter) {
+  const lines = ta.value.split('\n').length || 1;
+  let nums = '';
+  for (let i = 1; i <= Math.max(lines, 1); i++) nums += i + '\n';
+  gutter.textContent = nums;
+  gutter.scrollTop = ta.scrollTop;
+}
+
 function renderFR(q, disabled) {
   const inputArea = document.getElementById('q-input-area');
+
+  const wrap = document.createElement('div');
+  wrap.className = 'editor-wrap' + (disabled ? ' disabled' : '');
+  wrap.id = 'editor-wrap';
+
+  const gutter = document.createElement('div');
+  gutter.className = 'line-nums';
+  gutter.id = 'line-nums';
+  gutter.textContent = '1\n';
 
   const ta = document.createElement('textarea');
   ta.className = 'free-response';
@@ -1340,8 +1417,12 @@ function renderFR(q, disabled) {
   if (disabled) {
     ta.value = studentAnswers[currentQ] || '';
     ta.disabled = true;
+    updateLineNums(ta, gutter);
   }
-  inputArea.appendChild(ta);
+
+  wrap.appendChild(gutter);
+  wrap.appendChild(ta);
+  inputArea.appendChild(wrap);
 
   if (!disabled) {
     ta.addEventListener('keydown', (e) => {
@@ -1392,6 +1473,12 @@ function renderFR(q, disabled) {
         ta.selectionStart = ta.selectionEnd = start + insert.length;
       }
     });
+
+    // Keep line numbers in sync with textarea content and scroll
+    ta.addEventListener('input', () => updateLineNums(ta, gutter));
+    ta.addEventListener('scroll', () => { gutter.scrollTop = ta.scrollTop; });
+    // Also update after keydown (catches Enter, Tab, brace expansion)
+    ta.addEventListener('keyup', () => updateLineNums(ta, gutter));
 
     const actionRow = document.createElement('div');
     actionRow.className = 'action-row';
@@ -1516,7 +1603,18 @@ Respond in 3-5 sentences maximum. Start your response with exactly one of these 
     feedbacks[currentQ] = { cls, text };
 
     const nextBtn = document.getElementById('next-btn');
-    if (currentQ < 15) nextBtn.style.display = 'inline-block';
+    const tryAgainBtn = document.getElementById('try-again-btn');
+    const skipBtn = document.getElementById('skip-q-btn');
+    if (isCorrect) {
+      if (currentQ < 15) nextBtn.style.display = 'inline-block';
+      if (tryAgainBtn) tryAgainBtn.style.display = 'none';
+      if (skipBtn) skipBtn.style.display = 'none';
+    } else {
+      // Wrong or partial — offer try again and skip
+      if (tryAgainBtn) tryAgainBtn.style.display = 'inline-block';
+      if (skipBtn) skipBtn.style.display = 'inline-block';
+      if (currentQ < 15) nextBtn.style.display = 'inline-block';
+    }
     checkWin();
   } catch (err) {
     if (indicator) indicator.classList.remove('active');
@@ -1527,6 +1625,35 @@ Respond in 3-5 sentences maximum. Start your response with exactly one of these 
     fb.textContent = 'Could not reach the grader. Check your internet connection and try again.';
     fb.style.display = 'block';
   }
+}
+
+// ── Try again / skip ──
+function tryAgain() {
+  // Reset just this question so the student can resubmit
+  answered[currentQ] = null;
+  studentAnswers[currentQ] = '';
+  feedbacks[currentQ] = null;
+  // Un-reveal the tile
+  const tile = tileElements[currentQ];
+  if (tile) {
+    tile.classList.remove('revealed','answered-correct','answered-wrong');
+  }
+  // Hide try-again/skip, re-render the question fresh
+  document.getElementById('try-again-btn').style.display = 'none';
+  document.getElementById('skip-q-btn').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+  renderQuestion();
+}
+
+function skipQuestion() {
+  // Mark as answered-wrong (null tile stays hidden) and move on
+  if (answered[currentQ] === null) {
+    answered[currentQ] = false;
+    revealTile(currentQ, false);
+  }
+  document.getElementById('try-again-btn').style.display = 'none';
+  document.getElementById('skip-q-btn').style.display = 'none';
+  nextQuestion();
 }
 
 // ── Tile reveal ──
